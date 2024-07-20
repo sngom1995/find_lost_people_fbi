@@ -33,6 +33,24 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util.js';
   
   // Root Endpoint
   // Displays a simple message to the user
+
+app.get('/filteredimage/', async (req, res) =>{
+  const { image_url} = req.query;
+  if (!image_url){
+    return res.status(400).json({message: 'You must provide an image url', statusCode: 400, error: 'Bad request'});
+  }
+  try {
+    console.log(image_url)
+    const result = await filterImageFromURL(image_url);
+    res.setHeader('Content-Type', 'image/jpg')
+    res.sendFile(result);
+    res.on('finish', ()=> deleteLocalFiles([result]))
+  }
+  catch (err){
+    console.log(err)
+    return res.status(500).send(err.message);
+  }
+})
   app.get( "/", async (req, res) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
